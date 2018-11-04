@@ -374,6 +374,9 @@ def createInstance(imageName, flavorName, instanceName):
     with open(instancesFile, "wb") as f:
         pickle.dump(instancesDict, f)
 
+    # update the machine configs
+    updateResources(machineName, flavorName, 'createInstance')
+
     return status
 
 # returns true if the instance already exists
@@ -410,30 +413,91 @@ def flavorExists(flavorName):
 def findMachine(flavorName):
     machineName = ""
 
-    hardwareFile = 'hardwareConfiguration.dct'
+    hardwareFile = 'currentHardwareConfiguration.dct'
 
     if fileExists(hardwareFile) and fileNotEmpty(hardwareFile):
         with open(hardwareFile, "rb") as f:
             hardwareList = pickle.load(f)
 
-            for config in hardwareList:
-                for key, value in config.items():
-                    # only check the machines and not racks
-                    if len(value) > 1:
-                        status = canHost(key, flavorName)
-                        if status == 'SUCCESS':
-                            return key
+        for config in hardwareList:
+            for key, value in config.items():
+                # only check the machines and not racks
+                if len(value) > 1:
+                    status = canHost(key, flavorName)
+                    if status == 'SUCCESS':
+                        return key              
 
-                
     return machineName
 
-# def instancesRunning():
-#     fileName = "instancesRunning.dct"
+# update the machine resources when creating a new instance
+# action: createInstance - subtract resources
+# action: deleteInstance - add resources
+def updateResources(machineName, flavorName, action):
+    flavorFile = "flavorConfiguration.dct"
+    currHardwareFile = "currentHardwareConfiguration.dct"
+    columns = ["mem", "num-disks", "num-vcpus"]
 
-#     if fileExists(fileName):
-#         fileName = open(fileName, "a")
-#     else:
-#         fileName = open(fileName, "w")
+
+    if fileExists(flavorFile)  and fileExists(currHardwareFile) and fileNotEmpty(flavorFile) and fileNotEmpty(currHardwareFile):
+		# retrieve the flavor and current hardware dicts from their files
+        with open(flavorFile, "rb") as f:
+            flavorDict = pickle.load(f)
+        with open(currHardwareFile, "rb") as f:
+            currentHardwareDict = pickle.load(f)
+		
+        m = currentHardwareDict[machineName]
+        f = flavorDict[flavorName]
+
+        # update the resources
+        for val in columns:
+            if action == 'createInstance':
+                newValue = int(m[val]) - int(f[val])
+            else:
+                newValue = int(m[val]) + int(f[val])
+
+            currentHardwareDict[machineName][val] = newValue
+
+        with open(currHardwareFile, "wb") as f:
+            pickle.dump(currentHardwareDict, f)
+
+# returns a list of all the running instances
+# command: aggiestack server list
+def instancesList():
+    status = "FAILURE"
+    instancesFile = "instancesRunning.dct"
+    if fileExists(instancesFile) and fileNotEmpty(instancesFile):
+        with open(instancesFile, "rb") as f:
+            instancesDict = pickle.load(f)
+
+        printMachineHardwareDict(instancesDict, instancesFile)
+
+        status = 'SUCCESS'
+
+    else:
+        print("No information available")
+
+    return status
+
+# command: aggiestack admin show hardware
+def showAvailableHardware():
+    status = "FAILURE"
+    currHardwareFile = "currentHardwareConfiguration.dct"
+    
+    if fileExists(currHardwareFile) and fileNotEmpty(currHardwareFile):
+        with open(currHardwareFile, "rb") as f:
+            currentHardwareDict = pickle.load(f)
+
+        for config in currentHardwareDict:
+            for key, value in config.items():
+                # only print the machines and not racks
+                if len(value) > 1:
+                    print('%s : %s' % (key, value))
+        status = 'SUCCESS'
+
+    else:
+        print("No information available.")
+    return status
+
 
 
 if __name__ == "__main__":
