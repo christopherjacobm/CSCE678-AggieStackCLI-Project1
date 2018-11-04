@@ -1,0 +1,20 @@
+aggiestack show images     SUCCESS
+aggiestack config --images image-config.txt     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack config --flavors flavor-config.txt     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack show images     SUCCESS
