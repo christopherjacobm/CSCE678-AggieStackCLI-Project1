@@ -19,3 +19,53 @@ aggiestack config --hardware hdwr-config.txt     SUCCESS
 aggiestack show hardware     SUCCESS
 aggiestack show images     SUCCESS
 aggiestack show hardware     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack config --flavors flavor-config.txt     SUCCESS
+aggiestack config --images image-config.txt     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack server list     FAILURE
+aggiestack admin show instances     FAILURE
+aggiestack admin show hardware     SUCCESS
+aggiestack admin show instances     FAILURE
+aggiestack server create --image linux-ubuntu --flavor small my-first-instance     SUCCESS
+aggiestack admin show instances     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server create --image linux-ubuntu --flavor medium my-second-instance     SUCCESS
+aggiestack admin show instances     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin show hardware     FAILURE
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack config --images image-config.txt     SUCCESS
+aggiestack server create --image linux-ubuntu --flavor medium my-second-instance     FAILURE
+aggiestack server create --image linux-ubuntu --flavor medium my-second-instance     FAILURE
+aggiestack config --flavors flavor-config.txt     SUCCESS
+aggiestack server create --image linux-ubuntu --flavor medium my-second-instance     FAILURE
+aggiestack server create --image linux-ubuntu --flavor medium my-second-instance     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin show instances     SUCCESS
+aggiestack server create --image linux-ubuntu --flavor small my-first-instance     SUCCESS
+aggiestack admin show instances     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server create --image linux-ubuntu --flavor small my-third-instance     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server create --image linux-ubuntu --flavor medium my-forth-instance     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server create --image linux-ubuntu --flavor small my-fifth-instance     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server create --image linux-ubuntu --flavor medium my-sixth-instance     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin show instances     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack server create --image linux-ubuntu --flavor medium my-sixth-instance     FAILURE
+aggiestack server list     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack server list     SUCCESS

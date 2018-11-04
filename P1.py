@@ -62,18 +62,34 @@ def main():
         elif args[2] == "admin":
             if args[3] == "show":
                 if args[4] == "hardware":
-                    status = showContent("currentHardwareConfiguration.dct")
+                    # status = showContent("currentHardwareConfiguration.dct")
+                    status = showAvailableHardware()
+                    logfile.write(command + "     " + status +"\n")
+                elif args[4] == "instances":
+                    status = showPhysicalServers()
                     logfile.write(command + "     " + status +"\n")
                 else:
                     error(command, logfile)
             elif args[3] == "can_host":
                 if len(args) > 4 and args[4] and args[5]:
-                    status = canHost(args[4],args[5])
+                    status, _ = canHost(args[4],args[5])
                     logfile.write(command + "     " + status +"\n")
                 else:
                     error(command, logfile)
             else:
                 error(command, logfile)
+
+        elif args[2] == "server":   #aggiestack server create --image IMAGE --flavor FLAVOR_NAME INSTANCE_NAME
+            if args[3] == "create":
+                if args[4] == "--image" and args[5] and args[6] == "--flavor" and args[7] and args[8]:
+                   status = createInstance(args[5], args[7] , args[8] ) 
+                   logfile.write(command + "     " + status +"\n")     
+            if args[3] == "list":
+                status = instancesList()
+                logfile.write(command + "     " + status +"\n")
+
+            if args[3] == "delete":
+                pass
         else:
             error(command, logfile)
     else:
@@ -311,13 +327,15 @@ def canHost(machineName, flavorName):
             for val in columns:
                 if int(flavorDict[flavorName][val]) > int(currentHardwareDict[machineName][val]):
                     print("No")
-                    return status
+                    return status, False
             print("Yes")
+            return status, True
         else:
             print("Record not found")
+            return status, False
     else:
         print("No information available")
-    return status   
+        return status, False   
 
 
 
@@ -419,13 +437,12 @@ def findMachine(flavorName):
         with open(hardwareFile, "rb") as f:
             hardwareList = pickle.load(f)
 
-        for config in hardwareList:
-            for key, value in config.items():
-                # only check the machines and not racks
-                if len(value) > 1:
-                    status = canHost(key, flavorName)
-                    if status == 'SUCCESS':
-                        return key              
+        for key, value in hardwareList.items():
+            # only check the machines and not racks
+            if len(value) > 1:
+                _, canHostVM = canHost(key, flavorName)
+                if canHostVM:
+                    return key              
 
     return machineName
 
@@ -469,7 +486,17 @@ def instancesList():
         with open(instancesFile, "rb") as f:
             instancesDict = pickle.load(f)
 
-        printMachineHardwareDict(instancesDict, instancesFile)
+        # printMachineHardwareDict(instancesDict, instancesFile)
+
+        
+        for instance, configuration in instancesDict.items():
+            els = list(configuration.items())
+
+            print("name : ", instance, " ", end='')
+            for i in range(len(els) - 1):
+                print(els[i],  " ", end='')
+
+            print()
 
         status = 'SUCCESS'
 
@@ -487,17 +514,36 @@ def showAvailableHardware():
         with open(currHardwareFile, "rb") as f:
             currentHardwareDict = pickle.load(f)
 
-        for config in currentHardwareDict:
-            for key, value in config.items():
-                # only print the machines and not racks
-                if len(value) > 1:
-                    print('%s : %s' % (key, value))
+        for key, value in currentHardwareDict.items():
+            # only print the machines and not racks
+            if len(value) > 1:
+                print('%s : %s' % (key, value))
         status = 'SUCCESS'
 
     else:
         print("No information available.")
     return status
 
+# aggiestack admin show instances
+# For each instance currently running, 
+# it shows where (which physical server) the instance is running
+def showPhysicalServers():
+    status = "FAILURE"
+
+    instancesFile = "instancesRunning.dct"
+    if fileExists(instancesFile) and fileNotEmpty(instancesFile):
+        with open(instancesFile, "rb") as f:
+            instancesDict = pickle.load(f)
+
+        for instance, configuration in instancesDict.items():
+            print('%s : %s' % (instance, configuration["machine"]))
+
+        status = "SUCCESS"
+
+    else:
+        print("No information available.")
+
+    return status
 
 
 if __name__ == "__main__":
