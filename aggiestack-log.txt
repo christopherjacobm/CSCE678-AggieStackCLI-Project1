@@ -69,3 +69,11 @@ aggiestack server list     SUCCESS
 aggiestack server list     SUCCESS
 aggiestack server list     SUCCESS
 aggiestack server list     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin show instances     SUCCESS
+aggiestack admin show instances     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server delete my-sixth-instance     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin show instances     SUCCESS

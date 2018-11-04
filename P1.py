@@ -88,8 +88,9 @@ def main():
                 status = instancesList()
                 logfile.write(command + "     " + status +"\n")
 
-            if args[3] == "delete":
-                pass
+            if args[3] == "delete" and args[4]:
+                status = deleteInstance(args[4])
+                logfile.write(command + "     " + status +"\n")
         else:
             error(command, logfile)
     else:
@@ -545,6 +546,37 @@ def showPhysicalServers():
 
     return status
 
+# aggiestack server delete INSTANCE_NAME
+def deleteInstance(instanceName):
+
+    status = 'FAILURE'
+
+    instancesFile = "instancesRunning.dct"
+    if fileExists(instancesFile) and fileNotEmpty(instancesFile):
+        # load the existing instances
+        with open(instancesFile, "rb") as f:
+            instancesDict = pickle.load(f)
+
+            if instanceExits(instanceName, instancesDict):
+                status = 'SUCCESS'
+
+                # update the machine resources
+                machineName = instancesDict[instanceName]["machine"]
+                flavorName = instancesDict[instanceName]["flavor"]
+                updateResources(machineName, flavorName, 'deleteInstance')
+
+                # delete the instance from the instances dictionary
+                del instancesDict[instanceName]
+
+                # save the updated instance file
+                with open(instancesFile, "wb") as f:
+                    pickle.dump(instancesDict, f)
+            else:
+                print("Given instance does not exist")
+
+    else:
+        print("Given instance does not exist")
+    return status
 
 if __name__ == "__main__":
     main()
