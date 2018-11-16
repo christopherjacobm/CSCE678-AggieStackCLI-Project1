@@ -76,6 +76,24 @@ def main():
                     logfile.write(command + "     " + status +"\n")
                 else:
                     error(command, logfile)
+            elif args[3] == "evacuate":
+                if len(args) > 4 and args[4]:
+                    status = evacuate(args[4])
+                    logfile.write(command + "     " + status +"\n")
+                else:
+                    error(command, logfile)
+            elif args[3] == "remove":
+                if len(args) > 4 and args[4]:
+                    status = removeMachine(args[4])
+                    logfile.write(command + "     " + status +"\n")
+                else:
+                    error(command, logfile)
+            elif args[3] == "add":
+                if len(args) > 9 and args[4] and args[5] and args[6] and args[7] and args[8] and args[9]:
+                    status = addMachine(args[4],args[5],args[6],args[7],args[8],args[9])
+                    logfile.write(command + "     " + status +"\n")
+                else:
+                    error(command, logfile)
             else:
                 error(command, logfile)
 
@@ -427,7 +445,19 @@ def flavorExists(flavorName):
             if flavorName in flavorsDict.keys():
                 return True
     return False
-
+    
+# returns true if the machine exists in hardwareConfiguration.dct
+def machineExistsInHardwareConfig(machineName, hardwareConfigDict):
+    if machineName in hardwareConfigDict[1].keys():
+        return True
+    return False
+    
+# returns true if the machine exists in currentHardwareConfiguration.dct
+def machineExistsInCurrentHardwareConfig(machineName, currentHardwareConfigDict):
+    if machineName in currentHardwareConfigDict.keys():
+        return True
+    return False
+    
 # find the machine to host a virutal instance
 def findMachine(flavorName):
     machineName = ""
@@ -577,6 +607,64 @@ def deleteInstance(instanceName):
     else:
         print("Given instance does not exist")
     return status
+    
+# aggiestack admin evacuate RACK_NAME
+# Moves all the servers on this rack to machines on another rack, if possible
+def evacuate(rackName):
+    pass
+# aggiestack admin remove MACHINE
+# Removes a machine, making sure there is no instance currently on it
+ 
+def removeMachine(machineName):
+    status = 'FAILURE'
+    foundInHardwareConfig = False
+    
+    # Check if there is an instance running on this machine
+    instancesFile = "instancesRunning.dct"
+    if fileExists(instancesFile) and fileNotEmpty(instancesFile):
+        with open(instancesFile, "rb") as f:
+            instancesDict = pickle.load(f)
+        
+        for instance, configuration in instancesDict.items():
+            if configuration['machine'] == machineName:
+                print("Instance ",instance, " is already running on machine ",machineName)
+                return status
+                
+    #remove this machine from hardwareConfiguration.dct
+    file = 'hardwareConfiguration.dct'
+    if fileExists(file) and fileNotEmpty(file):
+        with open(file, "rb") as f:
+            hardwareConfigDict = pickle.load(f)
+            
+            if machineExistsInHardwareConfig(machineName,hardwareConfigDict):
+                foundInHardwareConfig = True
+                del hardwareConfigDict[1][machineName]
+                with open(file, "wb") as f:
+                    pickle.dump(hardwareConfigDict, f)
+                                        
+    #remove this machine from currentHardwareConfiguration.dct              
+    file = 'currentHardwareConfiguration.dct'
+    if fileExists(file) and fileNotEmpty(file):
+        with open(file, "rb") as f:
+            currentHardwareConfigDict = pickle.load(f)
+            
+            if machineExistsInCurrentHardwareConfig(machineName,currentHardwareConfigDict):
+                del currentHardwareConfigDict[machineName]
+                with open(file, "wb") as f:
+                    pickle.dump(currentHardwareConfigDict, f)
+            elif not foundInHardwareConfig:
+                print("Machine not found! ")
+                return status
+                    
+    status = 'SUCCESS'
+    
+    return status
+# aggiestack admin add –-mem MEM –disk NUM_DISKS –vcpus VCPUs –ip IP –rack RACK_NAME MACHINE
+# Adds a machine
+def addMachine(mem,numDisks,vCPUs,ip,rackName,machineName):
+    pass
+ 
+    
 
 if __name__ == "__main__":
     main()
