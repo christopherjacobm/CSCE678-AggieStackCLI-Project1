@@ -89,8 +89,8 @@ def main():
                 else:
                     error(command, logfile)
             elif args[3] == "add":
-                if len(args) > 9 and args[4] and args[5] and args[6] and args[7] and args[8] and args[9]:
-                    status = addMachine(args[4],args[5],args[6],args[7],args[8],args[9])
+                if len(args) > 14 and args[4] == "--mem" and args[5] and args[6]=="--disk" and args[7] and args[8]=="--vcpus" and args[9] and args[10]=="--ip" and args[11] and args[12]=="--rack" and args[13] and args[14]:
+                    status = addMachine([args[5],args[7],args[9],args[11],args[13],args[14]])
                     logfile.write(command + "     " + status +"\n")
                 else:
                     error(command, logfile)
@@ -612,6 +612,7 @@ def deleteInstance(instanceName):
 # Moves all the servers on this rack to machines on another rack, if possible
 def evacuate(rackName):
     pass
+    
 # aggiestack admin remove MACHINE
 # Removes a machine, making sure there is no instance currently on it
  
@@ -659,12 +660,48 @@ def removeMachine(machineName):
     status = 'SUCCESS'
     
     return status
+    
 # aggiestack admin add –-mem MEM –disk NUM_DISKS –vcpus VCPUs –ip IP –rack RACK_NAME MACHINE
 # Adds a machine
-def addMachine(mem,numDisks,vCPUs,ip,rackName,machineName):
-    pass
- 
+def addMachine(argsList): #argsList -> [mem,numDisks,vCPUs,ip,rackName,machineName]
+    status = 'FAILURE'
     
+    machineName = argsList[5]  
+  
+    columns = ["mem", "num-disks", "num-vcpus", "ip","rack"]
+    
+    # Create a dict for the new machine
+    machineDict ={}
+    for i in range(len(columns)):
+        machineDict[columns[i]] = argsList[i]
+
+    hcFile = 'hardwareConfiguration.dct'
+    if fileExists(hcFile) and fileNotEmpty(hcFile):
+        with open(hcFile, "rb") as f:
+            hardwareConfigDict = pickle.load(f)
+            
+    chcFile = 'currentHardwareConfiguration.dct'
+    if fileExists(chcFile) and fileNotEmpty(chcFile):
+        with open(chcFile, "rb") as f:
+            currentHardwareConfigDict = pickle.load(f)
+                        
+    if machineExistsInHardwareConfig(machineName,hardwareConfigDict) or machineExistsInCurrentHardwareConfig(machineName,currentHardwareConfigDict):
+        print("A machine with this name already exists!")
+        return status     
+    
+    # Add this machine to hardwareConfiguration.dct
+    hardwareConfigDict[1][machineName] = machineDict
+    with open(hcFile, "wb") as f:
+        pickle.dump(hardwareConfigDict, f)
+    
+    # Add this machine to currentHardwareConfiguration.dct         
+    currentHardwareConfigDict[machineName] = machineDict
+    with open(chcFile, "wb") as f:
+        pickle.dump(currentHardwareConfigDict, f)
+                    
+    status = 'SUCCESS'
+    
+    return status
 
 if __name__ == "__main__":
     main()
