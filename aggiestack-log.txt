@@ -77,3 +77,75 @@ aggiestack admin show hardware     SUCCESS
 aggiestack server delete my-sixth-instance     SUCCESS
 aggiestack admin show hardware     SUCCESS
 aggiestack admin show instances     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin can_host m2 small     SUCCESS
+aggiestack admin can_host m2 medium     SUCCESS
+aggiestack admin evacuate r1     FAILURE
+aggiestack admin evacuate r1     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin evacuate r1     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack admin remove m4     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin remove calvin     SUCCESS
+aggiestack admin remove hobbes     SUCCESS
+aggiestack admin remove dora     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack show flavors     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack admin evacuate r1     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack admin evacuate r1     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin evacuate r2     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack admin evacuate r1     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin remove m2     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin evacuate r2     FAILURE
+aggiestack admin show hardware     SUCCESS
+aggiestack admin remove m4     SUCCESS
+aggiestack admin remove calvin     SUCCESS
+aggiestack admin remove hobbes     SUCCESS
+aggiestack admin remove dora     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin evacuate r1     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin remove calvin     SUCCESS
+aggiestack admin remove hobbes     SUCCESS
+aggiestack admin remove dora     SUCCESS
+aggiestack admin remove m4     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin evacuate r1     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin server list     FAILURE
+aggiestack server list     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin remove m2     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin evacuate r2     FAILURE
+aggiestack admin show hardware     SUCCESS
+aggiestack admin can_host k1 small     SUCCESS
+aggiestack admin can_host k1 large     SUCCESS
+aggiestack admin can_host k3 large     SUCCESS
+aggiestack admin can_host k3 small     SUCCESS
+aggiestack admin remove m4     SUCCESS
+aggiestack admin remove dora     SUCCESS
+aggiestack admin remove calvin     SUCCESS
+aggiestack admin remove hobbes     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack admin show instances     SUCCESS

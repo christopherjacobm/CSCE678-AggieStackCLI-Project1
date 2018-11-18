@@ -72,7 +72,11 @@ def main():
                     error(command, logfile)
             elif args[3] == "can_host":
                 if len(args) > 4 and args[4] and args[5]:
-                    status, _ = canHost(args[4],args[5])
+                    status, canHostVM = canHost(args[4],args[5])
+                    if canHostVM:
+                        print("Yes")
+                    else:
+                        print("No")
                     logfile.write(command + "     " + status +"\n")
                 else:
                     error(command, logfile)
@@ -197,12 +201,6 @@ def readInputFile(fileToRead, savedFile):
         else:
             listToLoop = flavor
 
-         # a dictionary to store all the configurations
-        if listToLoop == hardware:
-            contentList = []
-        else:
-            contentList = {}
-
         # open the input file to read
         f = open(fileToRead, "r")
         lines = f.readlines()
@@ -236,7 +234,8 @@ def readInputFile(fileToRead, savedFile):
                 contentList[tokens[0]] = config
             config = {}
 
-        if listToLoop == hardware:   
+        if listToLoop == hardware:
+            contentList = []
             contentList.append(racks_config)
             contentList.append(machines_config)
 
@@ -322,41 +321,45 @@ def updateCurrentHardware():
 
     return status
 
-
 """
-canHost - Checks if a particular machine currently has the resources to host a vCPU of the given flavor
-"""     
-def canHost(machineName, flavorName):
+canHost - Checks if a particular machine currently has the resources to host a vCPU of the given flavor, in the currentHardwareDict
+"""   
+def canHostDict(machineName, flavorName, currentHardwareDict):
     status = "FAILURE"
     flavorFile = "flavorConfiguration.dct"
-    currHardwareFile = "currentHardwareConfiguration.dct"
     columns = ["mem", "num-disks", "num-vcpus"]
     
-    if fileExists(flavorFile)  and fileExists(currHardwareFile) and fileNotEmpty(flavorFile) and fileNotEmpty(currHardwareFile):
-		# retrieve the flavor and current hardware dicts from their files
+    if fileExists(flavorFile) and fileNotEmpty(flavorFile):
         with open(flavorFile, "rb") as f:
-            flavorDict = pickle.load(f)
-        with open(currHardwareFile, "rb") as f:
-            currentHardwareDict = pickle.load(f)
-        
-		# find the correct machine and flavor
+           flavorDict = pickle.load(f)
+        # find the correct machine and flavor
         if (flavorName in flavorDict) and (machineName in currentHardwareDict):
             status = "SUCCESS"
 			# check if the number of resources required is <= those available
             for val in columns:
                 if int(flavorDict[flavorName][val]) > int(currentHardwareDict[machineName][val]):
-                    print("No")
                     return status, False
-            print("Yes")
             return status, True
         else:
             print("Record not found")
             return status, False
+    
+"""
+canHost - Checks if a particular machine currently has the resources to host a vCPU of the given flavor
+"""     
+def canHost(machineName, flavorName):
+    status = "FAILURE"
+    
+    currHardwareFile = "currentHardwareConfiguration.dct"
+    
+    if  fileExists(currHardwareFile) and fileNotEmpty(currHardwareFile):
+		# retrieve the flavor and current hardware dicts from their files
+        with open(currHardwareFile, "rb") as f:
+            currentHardwareDict = pickle.load(f)
+        return canHostDict(machineName, flavorName, currentHardwareDict)    
     else:
         print("No information available")
         return status, False   
-
-
 
 # create an instance if it does not exist
 # Give error if the instance already exits
@@ -477,22 +480,17 @@ def findMachine(flavorName):
 
     return machineName
 
-# update the machine resources when creating a new instance
+# updates the machine resources dict (currentHardwareDict), but does not write to file
 # action: createInstance - subtract resources
-# action: deleteInstance - add resources
-def updateResources(machineName, flavorName, action):
+# action: deleteInstance - add resources    
+def updateResourcesDict(machineName, flavorName, action,currentHardwareDict):
     flavorFile = "flavorConfiguration.dct"
-    currHardwareFile = "currentHardwareConfiguration.dct"
     columns = ["mem", "num-disks", "num-vcpus"]
-
-
-    if fileExists(flavorFile)  and fileExists(currHardwareFile) and fileNotEmpty(flavorFile) and fileNotEmpty(currHardwareFile):
-		# retrieve the flavor and current hardware dicts from their files
+     
+    if fileExists(flavorFile)  and  fileNotEmpty(flavorFile):
         with open(flavorFile, "rb") as f:
             flavorDict = pickle.load(f)
-        with open(currHardwareFile, "rb") as f:
-            currentHardwareDict = pickle.load(f)
-		
+            
         m = currentHardwareDict[machineName]
         f = flavorDict[flavorName]
 
@@ -504,6 +502,20 @@ def updateResources(machineName, flavorName, action):
                 newValue = int(m[val]) + int(f[val])
 
             currentHardwareDict[machineName][val] = newValue
+            
+# update the machine resources when creating a new instance
+# action: createInstance - subtract resources
+# action: deleteInstance - add resources
+def updateResources(machineName, flavorName, action):
+    currHardwareFile = "currentHardwareConfiguration.dct"
+
+
+    if fileExists(currHardwareFile) and fileNotEmpty(currHardwareFile):
+		# retrieve the flavor and current hardware dicts from their files
+        with open(currHardwareFile, "rb") as f:
+            currentHardwareDict = pickle.load(f)
+            
+        updateResourcesDict(machineName, flavorName, action, currentHardwareDict)
 
         with open(currHardwareFile, "wb") as f:
             pickle.dump(currentHardwareDict, f)
@@ -516,15 +528,12 @@ def instancesList():
     if fileExists(instancesFile) and fileNotEmpty(instancesFile):
         with open(instancesFile, "rb") as f:
             instancesDict = pickle.load(f)
-
-        # printMachineHardwareDict(instancesDict, instancesFile)
-
         
         for instance, configuration in instancesDict.items():
             els = list(configuration.items())
 
             print("name : ", instance, " ", end='')
-            for i in range(len(els) - 1):
+            for i in range(len(els)):
                 print(els[i],  " ", end='')
 
             print()
@@ -608,10 +617,69 @@ def deleteInstance(instanceName):
         print("Given instance does not exist")
     return status
     
+# Moves an instance to a new machine, does not save dicts to files 
+def migrateInstance(instance, newMachine, instancesDict, currentHardwareDict):
+    #modify instance file entry
+    oldMachine = instancesDict[instance]['machine']
+    instancesDict[instance]['machine'] = newMachine
+    
+    #updateResources deleteInstance
+    updateResourcesDict(oldMachine, instancesDict[instance]['flavor'], 'deleteInstance',currentHardwareDict)
+    
+    #updateResource createInstance
+    updateResourcesDict(newMachine, instancesDict[instance]['flavor'], 'createInstance',currentHardwareDict)
+    
 # aggiestack admin evacuate RACK_NAME
 # Moves all the servers on this rack to machines on another rack, if possible
 def evacuate(rackName):
-    pass
+    status = 'FAILURE'
+    
+    # separate machines into those on this rack and those on other racks
+    file = 'currentHardwareConfiguration.dct'
+    if fileExists(file) and fileNotEmpty(file):
+        with open(file, "rb") as f:
+            currentHardwareConfigDict = pickle.load(f)
+            
+            evacuationRackMachines = []
+            otherRacksMachines = []
+            
+            for machine, configuration in currentHardwareConfigDict.items():
+                
+                if len(configuration)>1:
+                    if configuration["rack"] == rackName:
+                        evacuationRackMachines.append(machine)
+                    else:
+                        otherRacksMachines.append(machine)
+                    
+    #find the instances which are on machines on the given rack
+    instancesFile = "instancesRunning.dct"
+    if fileExists(instancesFile) and fileNotEmpty(instancesFile):
+        with open(instancesFile, "rb") as f:
+            instancesDict = pickle.load(f)
+        
+        for instance, configuration in instancesDict.items():
+            if configuration['machine'] in evacuationRackMachines:
+                #for each instance, find a machine which can host it, in otherRacksMachines
+                canHostVM = False
+                for newMachine in otherRacksMachines:
+                    _, canHostVM = canHostDict(newMachine,configuration['flavor'],currentHardwareConfigDict)
+                    if canHostVM:
+                        migrateInstance(instance, newMachine, instancesDict, currentHardwareConfigDict)
+                        break
+                if not canHostVM:
+                    print("The machines available are not capable of hosting these instances")
+                    return status
+                    
+    # save the updated instance file
+    with open(instancesFile, "wb") as f:
+        pickle.dump(instancesDict, f)
+
+    with open(file, "wb") as f:
+        pickle.dump(currentHardwareConfigDict, f)
+                    
+    status = 'SUCCESS'
+    
+    return status
     
 # aggiestack admin remove MACHINE
 # Removes a machine, making sure there is no instance currently on it
