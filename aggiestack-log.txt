@@ -325,3 +325,4 @@ aggiestack config --hardware hdwr-config.txt     SUCCESS
 aggiestack config --flavors flavor-config.txt     SUCCESS
 aggiestack config --images image-config.txt     SUCCESS
 aggiestack server create --image linux-19 --flavor large b8     SUCCESS
+aggiestack show images     SUCCESS

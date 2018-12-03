@@ -48,6 +48,7 @@ def main():
                 logfile.write(command + "     " + status +"\n")
             elif args[3] == "images":
                 status = showContent("imageConfiguration.dct")
+                print ("Below is the information about images cached on each rack:")
                 showRacksAndImages()
                 logfile.write(command + "     " + status +"\n")
             elif args[3] == "flavors":
@@ -921,6 +922,7 @@ def showRacksAndImages():
         with open(hardwareFile, "rb") as f:
             hardwareList = pickle.load(f)
 
+    print ("Rack   Cached images")
     for key, value in hardwareList.items():
         if len(value) == 1:
             print (key, getImagesOnRack(key))
