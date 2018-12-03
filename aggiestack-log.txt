@@ -265,3 +265,33 @@ aggiestack show hardware     SUCCESS
 aggiestack admin show hardware     SUCCESS
 aggiestack admin show images     FAILURE
 aggiestack show images     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack config --images image-config.txt     SUCCESS
+aggiestack config --flavors flavor-config.txt     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack admin show images     FAILURE
+aggiestack show images     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack config --flavors flavor-config.txt     SUCCESS
+aggiestack config --images image-config.txt     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server create --image linux-17 --flavor large b1     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server create --image linux-18 --flavor large b2     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server create --image linux-18 --flavor large b3     SUCCESS
+aggiestack server create --image linux-ubuntu-16 --flavor large b4     SUCCESS
+aggiestack server create --image linux-17 --flavor large b4     FAILURE
+aggiestack server create --image linux-17 --flavor large b5     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack admin show imagecaches r1     SUCCESS
+aggiestack admin show imagecaches r2     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack server create --image linux-ubuntu-16 --flavor large b6     SUCCESS
+aggiestack show images     SUCCESS

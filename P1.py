@@ -11,7 +11,6 @@ def main():
 
     # given command
     command = " ".join(args[1:])
-
     # open the log file if exists already, otherwise create one
     logfile = "aggiestack-log.txt"
     if fileExists(logfile):
@@ -109,6 +108,7 @@ def main():
         elif args[2] == "server":   #aggiestack server create --image IMAGE --flavor FLAVOR_NAME INSTANCE_NAME
             if args[3] == "create":
                 if args[4] == "--image" and args[5] and args[6] == "--flavor" and args[7] and args[8]:
+                   print ("Here")
                    status = createInstance(args[5], args[7] , args[8] ) 
                    logfile.write(command + "     " + status +"\n")     
             elif args[3] == "list":
@@ -345,7 +345,7 @@ def canHostDict(machineName, flavorName, currentHardwareDict):
         # find the correct machine and flavor
         if (flavorName in flavorDict) and (machineName in currentHardwareDict):
             status = "SUCCESS"
-			# check if the number of resources required is <= those available
+            # check if the number of resources required is <= those available
             for val in columns:
                 if int(flavorDict[flavorName][val]) > int(currentHardwareDict[machineName][val]):
                     return status, False
@@ -363,7 +363,7 @@ def canHost(machineName, flavorName):
     currHardwareFile = "currentHardwareConfiguration.dct"
     
     if  fileExists(currHardwareFile) and fileNotEmpty(currHardwareFile):
-		# retrieve the flavor and current hardware dicts from their files
+        # retrieve the flavor and current hardware dicts from their files
         with open(currHardwareFile, "rb") as f:
             currentHardwareDict = pickle.load(f)
         return canHostDict(machineName, flavorName, currentHardwareDict)    
@@ -487,7 +487,11 @@ def findMachine(imageName, flavorName):
         if found:
             return machineName
 
-        for key, value in hardwareList.items():
+        machines = [_ for _ in hardwareList.items() if len(_[1]) > 1]
+        print (machines)
+        sortedMachines = sortMachinesByRackStorageAvailable(machines)
+        print ( sortedMachines)
+        for key, value in sortedMachines:
             # only check the machines and not racks
             if len(value) > 1:
                 _, canHostVM = canHost(key, flavorName)
@@ -527,7 +531,7 @@ def updateResources(machineName, flavorName, action):
 
 
     if fileExists(currHardwareFile) and fileNotEmpty(currHardwareFile):
-		# retrieve the flavor and current hardware dicts from their files
+        # retrieve the flavor and current hardware dicts from their files
         with open(currHardwareFile, "rb") as f:
             currentHardwareDict = pickle.load(f)
             
@@ -787,6 +791,15 @@ def addMachine(argsList): #argsList -> [mem,numDisks,vCPUs,ip,rackName,machineNa
     status = 'SUCCESS'
     
     return status
+
+def sortMachinesByRackStorageAvailable(machines):
+    hardwareFile = 'currentHardwareConfiguration.dct'
+    hardwareList = {}
+    if fileExists(hardwareFile) and fileNotEmpty(hardwareFile):
+        with open(hardwareFile, "rb") as f:
+            hardwareList = pickle.load(f)
+    
+    return sorted(machines, reverse=True, key = lambda x:int(hardwareList[x[1]['rack']]['mem']))
 
 def rackExists(rackName):
     hardwareFile = 'currentHardwareConfiguration.dct'
