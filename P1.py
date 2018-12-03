@@ -108,7 +108,6 @@ def main():
         elif args[2] == "server":   #aggiestack server create --image IMAGE --flavor FLAVOR_NAME INSTANCE_NAME
             if args[3] == "create":
                 if args[4] == "--image" and args[5] and args[6] == "--flavor" and args[7] and args[8]:
-                   print ("Here")
                    status = createInstance(args[5], args[7] , args[8] ) 
                    logfile.write(command + "     " + status +"\n")     
             elif args[3] == "list":
@@ -907,7 +906,7 @@ def updateCaching(machineName, imageName):
             j += 1
 
         hardwareList[hardwareList[machineName]['rack']]['mem'] = int(hardwareList[hardwareList[machineName]['rack']]['mem']) - requiredSpace
-    print (hardwareList[machineName]['rack'], hardwareList[hardwareList[machineName]['rack']]['mem'])
+    # print (hardwareList[machineName]['rack'], hardwareList[hardwareList[machineName]['rack']]['mem'])
 
     with open(cacheFile, "wb") as f:
         pickle.dump(imageToRackMap, f)
