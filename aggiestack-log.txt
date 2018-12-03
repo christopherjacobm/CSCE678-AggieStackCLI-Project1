@@ -149,3 +149,119 @@ aggiestack show hardware     SUCCESS
 aggiestack admin show hardware     SUCCESS
 aggiestack server list     SUCCESS
 aggiestack admin show instances     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin show instances     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack server list     SUCCESS
+aggiestack serv     FAILURE
+aggiestack serv     FAILURE
+aggiestack server     FAILURE
+aggiestack server bhn     FAILURE
+aggiestack admin show hardware     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack show flovors     FAILURE
+aggiestack show flavors     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin show images     FAILURE
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack server create --image linux-ubuntu --flavor xlarge b1     FAILURE
+aggiestack server create --image linux-ubuntu --flavor xlarge b3     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack admin show images     FAILURE
+aggiestack admin show hardware     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack server create --image linux-ubuntu --flavor xlarge b1     FAILURE
+aggiestack server create --image linux-ubuntu --flavor xlarge b8     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin show flavors     FAILURE
+aggiestack show flavors     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack show flavors     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack config --images image-config.txt     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack show flavors     SUCCESS
+aggiestack config --flavors flavor-config.txt     SUCCESS
+aggiestack show flavors     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin show instances     FAILURE
+aggiestack server create --image linux-ubuntu-16 --flavor large b1     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack config --flavors flavor-config.txt     SUCCESS
+aggiestack config --images image-config.txt     SUCCESS
+aggiestack server create --image linux-ubuntu-16 --flavor large b1     SUCCESS
+aggiestack server create --image linux-ubuntu-16 --flavor large b2     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack config --images image-config.txt     SUCCESS
+aggiestack config --flavors flavor-config.txt     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server create --image linux-ubuntu-16 --flavor large b1     SUCCESS
+aggiestack server create --image linux-ubuntu-16 --flavor large b2     SUCCESS
+aggiestack server create --image linux-17 --flavor large b3     SUCCESS
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack config --images image-config.txt     SUCCESS
+aggiestack config --flavors flavor-config.txt     SUCCESS
+aggiestack server create --image linux-ubuntu-16 --flavor large b2     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server create --image linux-17 --flavor large b1     SUCCESS
+aggiestack server create --image linux-18 --flavor large b3     SUCCESS
+aggiestack server create --image linux-18 --flavor xlarge b4     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack server create --image linux-ubuntu-16 --flavor xlarge b5     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack server create --image linux-17 --flavor xlarge b5     FAILURE
+aggiestack server create --image linux-17 --flavor xlarge b6     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server create --image linux-17 --flavor xlarge b7     SUCCESS
+aggiestack server create --image linux-17 --flavor xlarge b8     SUCCESS
+aggiestack server create --image linux-17 --flavor xlarge b9     FAILURE
+aggiestack config --hardware hdwr-config.txt     SUCCESS
+aggiestack config --images image-config.txt     SUCCESS
+aggiestack config --flavors flavor-config.txt     SUCCESS
+aggiestack server create --image linux-ubuntu-16 --flavor large b2     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack server create --image linux-17 --flavor large b1     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack server create --image linux-18 --flavor large b3     SUCCESS
+aggiestack server create --image linux-18 --flavor xlarge b4     SUCCESS
+aggiestack server create --image linux-17 --flavor xlarge b5     SUCCESS
+aggiestack server create --image linux-16 --flavor xlarge b6     FAILURE
+aggiestack server create --image linux-ubuntu-16 --flavor xlarge b6     SUCCESS
+aggiestack server create --image linux-17 --flavor xlarge b6     FAILURE
+aggiestack server create --image linux-17 --flavor xlarge b7     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack admin show imagecaches r1     SUCCESS
+aggiestack admin show imagecaches r2     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack server create --image linux-ubuntu --flavor xlarge b7     FAILURE
+aggiestack server create --image linux-ubuntu --flavor xlarge b9     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack admin show imagecaches r1     SUCCESS
+aggiestack show images     SUCCESS
+aggiestack admin show imagecaches r2     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack show hardware     SUCCESS
+aggiestack admin show hardware     SUCCESS
+aggiestack admin show images     FAILURE
+aggiestack show images     SUCCESS

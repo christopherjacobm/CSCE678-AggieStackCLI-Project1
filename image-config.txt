@@ -1,4 +1,6 @@
-3
+5
 linux-ubuntu 128 /images/linux-ubuntu-v1.0.img
 linux-sles 512 /images/old-image.img
 linux-ubuntu-16 2048 /images/linux-ubuntu-16.img
+linux-17 40000 /images/linux-ubuntu-17.img
+linux-18 10000 /images/linux-ubuntu-18.img

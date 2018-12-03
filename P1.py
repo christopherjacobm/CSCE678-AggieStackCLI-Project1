@@ -31,6 +31,7 @@ def main():
                 status = readInputFile(args[4], "hardwareConfiguration.dct")
                 if status == "SUCCESS":
                     status = updateCurrentHardware()
+                    status = updateTheCacheMapping()
                 logfile.write(command + "     " + status +"\n")
             elif args[3] == "--images" and args[4]:
                 status = readInputFile(args[4], "imageConfiguration.dct")
@@ -48,6 +49,7 @@ def main():
                 logfile.write(command + "     " + status +"\n")
             elif args[3] == "images":
                 status = showContent("imageConfiguration.dct")
+                showRacksAndImages()
                 logfile.write(command + "     " + status +"\n")
             elif args[3] == "flavors":
                 status = showContent("flavorConfiguration.dct")
@@ -67,6 +69,9 @@ def main():
                     logfile.write(command + "     " + status +"\n")
                 elif args[4] == "instances":
                     status = showPhysicalServers()
+                    logfile.write(command + "     " + status +"\n")
+                elif args[4] == "imagecaches":
+                    status = cmdShowImageCachesRackName(args[5])
                     logfile.write(command + "     " + status +"\n")
                 else:
                     error(command, logfile)
@@ -106,13 +111,16 @@ def main():
                 if args[4] == "--image" and args[5] and args[6] == "--flavor" and args[7] and args[8]:
                    status = createInstance(args[5], args[7] , args[8] ) 
                    logfile.write(command + "     " + status +"\n")     
-            if args[3] == "list":
+            elif args[3] == "list":
                 status = instancesList()
                 logfile.write(command + "     " + status +"\n")
 
-            if args[3] == "delete" and args[4]:
+            elif args[3] == "delete" and args[4]:
                 status = deleteInstance(args[4])
                 logfile.write(command + "     " + status +"\n")
+
+            else:
+                error(command, logfile)
         else:
             error(command, logfile)
     else:
@@ -180,6 +188,8 @@ def readInputFile(fileToRead, savedFile):
 
     # a dcit to store all the machines for each rack
     racks_config = {}
+
+    contentList = {}
 
     startIndex = 1
 
@@ -395,7 +405,7 @@ def createInstance(imageName, flavorName, instanceName):
         print("The given flavor does not exist.")
         return status
 
-    machineName = findMachine(flavorName)
+    machineName = findMachine(imageName, flavorName)
     if machineName == "":
         print("Resources not available to fulfil this request.")
         return status
@@ -414,6 +424,8 @@ def createInstance(imageName, flavorName, instanceName):
     with open(instancesFile, "wb") as f:
         pickle.dump(instancesDict, f)
 
+
+    updateCaching(machineName, imageName)
     # update the machine configs
     updateResources(machineName, flavorName, 'createInstance')
 
@@ -462,7 +474,7 @@ def machineExistsInCurrentHardwareConfig(machineName, currentHardwareConfigDict)
     return False
     
 # find the machine to host a virutal instance
-def findMachine(flavorName):
+def findMachine(imageName, flavorName):
     machineName = ""
 
     hardwareFile = 'currentHardwareConfiguration.dct'
@@ -471,12 +483,16 @@ def findMachine(flavorName):
         with open(hardwareFile, "rb") as f:
             hardwareList = pickle.load(f)
 
+        found, machineName = tryIntelligentSelection(imageName, flavorName)
+        if found:
+            return machineName
+
         for key, value in hardwareList.items():
             # only check the machines and not racks
             if len(value) > 1:
                 _, canHostVM = canHost(key, flavorName)
                 if canHostVM:
-                    return key              
+                    return key
 
     return machineName
 
@@ -555,6 +571,7 @@ def showAvailableHardware():
             currentHardwareDict = pickle.load(f)
 
         for key, value in currentHardwareDict.items():
+            print (key, value)
             # only print the machines and not racks
             if len(value) > 1:
                 print('%s : %s' % (key, value))
@@ -771,5 +788,173 @@ def addMachine(argsList): #argsList -> [mem,numDisks,vCPUs,ip,rackName,machineNa
     
     return status
 
+def rackExists(rackName):
+    hardwareFile = 'currentHardwareConfiguration.dct'
+    if fileExists(hardwareFile) and fileNotEmpty(hardwareFile):
+        with open(hardwareFile, "rb") as f:
+            hardwareList = pickle.load(f)
+
+        for key, value in hardwareList.items():
+            # only check the racks and not machines
+            if len(value) == 1:
+                if key == rackName:
+                    return True
+    return False
+
+
+def cmdShowImageCachesRackName(rackName):
+
+    if not rackExists(rackName):
+        print ("Rack does not exist")
+        return "FAILURE"
+
+    allImages = getImagesOnRack(rackName)
+    currentCapacity = getSpaceOnRack(rackName)
+    print ("List of images on this rack are: ")
+    for img in allImages:
+        print (img,)
+    print ("Available Storage Space on this rack is:")
+    print (currentCapacity)
+    return "SUCCESS"
+
+
+
+def isImageCached(imageName):
+    cacheFile = 'cachedImagesToRackMapping.dct'
+    imageToRackMap = {}
+    if not fileExists(cacheFile):
+        with open(cacheFile, "wb") as f:
+            pickle.dump(imageToRackMap, f)
+        
+    with open(cacheFile, "rb") as f:
+        imageToRackMap = pickle.load(f)
+
+    return imageName in imageToRackMap.keys()
+
+def tryIntelligentSelection(imageName, flavorName):
+    isChached = isImageCached(imageName)
+    if not isChached:
+        return False, ""
+    
+    cacheFile = 'cachedImagesToRackMapping.dct'
+    imageToRackMap = {}
+    with open(cacheFile, "rb") as f:
+        imageToRackMap = pickle.load(f)
+
+    racksList = imageToRackMap[imageName]
+    hardwareFile = 'currentHardwareConfiguration.dct'
+    if fileExists(hardwareFile) and fileNotEmpty(hardwareFile):
+        with open(hardwareFile, "rb") as f:
+            hardwareList = pickle.load(f)
+
+        for key, value in hardwareList.items():
+            # only check the machines and not racks
+            if len(value) > 1:
+                _, canHostVM = canHost(key, flavorName)
+                if value['rack'] in racksList and canHostVM:
+                    return True, key
+
+    return False, ""
+
+def updateCaching(machineName, imageName):
+    hardwareFile = 'currentHardwareConfiguration.dct'
+    hardwareList = {}
+    if fileExists(hardwareFile) and fileNotEmpty(hardwareFile):
+        with open(hardwareFile, "rb") as f:
+            hardwareList = pickle.load(f)
+
+    cacheFile = 'cachedImagesToRackMapping.dct'
+    imageToRackMap = {}
+    with open(cacheFile, "rb") as f:
+        imageToRackMap = pickle.load(f)
+    
+    if imageName not in imageToRackMap.keys():
+        imageToRackMap[imageName] = []
+    imageToRackMap[imageName].append(hardwareList[machineName]['rack'])
+    
+    requiredSpace = 0
+    imagesFile = 'imageConfiguration.dct'
+    imagesDict = {}
+    if fileExists(imagesFile) and fileNotEmpty(imagesFile):
+        with open(imagesFile, "rb") as f:
+            imagesDict = pickle.load(f)
+    
+    if imageName in imagesDict.keys():
+        requiredSpace = int(imagesDict[imageName]['image-size-MB'])
+
+    imagesOnRack = getImagesOnRack(hardwareList[machineName]['rack'])
+    if imageName not in imagesOnRack:
+        n = len(imagesOnRack)
+        i = 0
+        while i < n and int(hardwareList[hardwareList[machineName]['rack']]['mem']) < requiredSpace:
+            if imagesOnRack[i] in imagesDict.keys():
+                hardwareList[hardwareList[machineName]['rack']]['mem'] = int(hardwareList[hardwareList[machineName]['rack']]['mem']) + int(imagesDict[imagesOnRack[i]]['image-size-MB'])
+            i += 1
+        j = 0
+        while j < i:
+            imageToRackMap[imagesOnRack[j]].remove(hardwareList[machineName]['rack'])
+            j += 1
+
+        hardwareList[hardwareList[machineName]['rack']]['mem'] = int(hardwareList[hardwareList[machineName]['rack']]['mem']) - requiredSpace
+    print (hardwareList[machineName]['rack'], hardwareList[hardwareList[machineName]['rack']]['mem'])
+
+    with open(cacheFile, "wb") as f:
+        pickle.dump(imageToRackMap, f)
+
+    with open(hardwareFile, "wb") as f:
+        pickle.dump(hardwareList, f)
+
+def showRacksAndImages():
+    hardwareFile = 'currentHardwareConfiguration.dct'
+    hardwareList = {}
+    if fileExists(hardwareFile) and fileNotEmpty(hardwareFile):
+        with open(hardwareFile, "rb") as f:
+            hardwareList = pickle.load(f)
+
+    for key, value in hardwareList.items():
+        if len(value) == 1:
+            print (key, getImagesOnRack(key))
+
+
+def getImagesOnRack(rackName):
+    cacheFile = 'cachedImagesToRackMapping.dct'
+    imageToRackMap = {}
+    with open(cacheFile, "rb") as f:
+        imageToRackMap = pickle.load(f)
+    
+    ans = []
+    for key, value in imageToRackMap.items():
+        if rackName in value:
+            ans.append(key)
+    
+    return ans
+
+def getSpaceOnRack(rackName):
+    hardwareFile = 'currentHardwareConfiguration.dct'
+    hardwareList = {}
+    if fileExists(hardwareFile) and fileNotEmpty(hardwareFile):
+        with open(hardwareFile, "rb") as f:
+            hardwareList = pickle.load(f)
+
+    return hardwareList[rackName]['mem']
+
+def updateTheCacheMapping():
+    cacheFile = 'cachedImagesToRackMapping.dct'
+    # a dictionary to store all image->rack_list map
+    imageToRackMap = {}
+    
+    if not fileExists(cacheFile):
+        with open(cacheFile, "wb") as f:
+            pickle.dump(imageToRackMap, f)
+
+    return "SUCCESS"
+
 if __name__ == "__main__":
     main()
+
+
+
+# Bonus Part
+# 1. show image: each rack which images
+# 2. image flavor instance : consider cached rack
+# 3. image cache rack name : images on rack and availabe space on rack
