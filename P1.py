@@ -488,9 +488,7 @@ def findMachine(imageName, flavorName):
             return machineName
 
         machines = [_ for _ in hardwareList.items() if len(_[1]) > 1]
-        print (machines)
         sortedMachines = sortMachinesByRackStorageAvailable(machines)
-        print ( sortedMachines)
         for key, value in sortedMachines:
             # only check the machines and not racks
             if len(value) > 1:
