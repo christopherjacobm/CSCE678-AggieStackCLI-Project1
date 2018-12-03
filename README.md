@@ -44,9 +44,9 @@ Example:
 python3 P1.py aggiestack show flavors
 
 ### Team Members
--- Bhavesh Munot (227002818)
--- Sukhdeep Gill (326007739)
--- Christopher Mureekan (227001713)
--- Krit Gupta (927001565)
+- Bhavesh Munot (227002818)
+- Sukhdeep Gill (326007739)
+- Christopher Mureekan (227001713)
+- Krit Gupta (927001565)
 
 
