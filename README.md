@@ -5,7 +5,7 @@ The project has been implemented in Python 3.
 
 The project is divided into two parts:
 
-### 1. **AggieStack CLI** - Part I : reads from the command line and generates output. 
+### **AggieStack CLI**
 
 The commands implemented are:
 - aggiestack config --hardware <file name>
@@ -21,14 +21,9 @@ The commands implemented are:
 - aggiestack admin show imagecaches RACK_NAME
 - aggiestack admin show hardware
 - aggiestack admin show instances
+- aggiestack admin can_host <machine name> <flavor>
 
 A Log file is mantained to show the status of each command - SUCCESS or FAILURE
-
-### 2. **AggieStack CLI** - Part II: capability to represent instances.
-
-The commands implemented are:
-- aggiestack admin show hardware
-- aggiestack admin can_host <machine name> <flavor>
 
 ### Instructions for running
 - The project runs on Python3. Please install Python3 in order to run the program.
