@@ -8,16 +8,20 @@ The project is divided into two parts:
 ### **AggieStack CLI**
 
 The commands implemented are:
+#### Config Commands
 - aggiestack config --hardware <file name>
 - aggiestack config --images <file name>
 - aggiestack config --flavors <file name>
+#### Show Commands
 - aggiestack show hardware
 - aggiestack show images
 - aggiestack show flavors
 - aggiestack show all
+#### Server Commands
 - aggiestack server list
 - aggiestack server delete INSTANCE_NAME
 - aggiestack server create --image IMAGE --flavor FLAVOR_NAME INSTANCE_NAME
+#### Admin Commands
 - aggiestack admin show imagecaches RACK_NAME
 - aggiestack admin show hardware
 - aggiestack admin show instances
@@ -48,5 +52,4 @@ python3 P1.py aggiestack show flavors
 - Sukhdeep Gill (326007739)
 - Christopher Mureekan (227001713)
 - Krit Gupta (927001565)
-
 
