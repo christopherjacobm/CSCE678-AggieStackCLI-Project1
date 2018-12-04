@@ -2,7 +2,8 @@
 # CSCE 678 - Distributed Systems and Cloud Computing
 This projects implements AggieStack CLI (the CLI for an OpenStack, a free and open source Software Platform for cloud computing.)
 The project has been implemented in Python 3.
-*NOTE* We have implemented Part C (bonus marks) and given the design for Part C in the report. Please take this into consideration
+
+**Please Note** We have implemented Part C (bonus marks) and given the design for Part C in the report. Please take this into consideration
 while grading the project.
 
 The project is divided into two parts:
